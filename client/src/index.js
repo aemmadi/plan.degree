@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import './index.css';
 import App from './App';
-import Landing from './Components/Landing'
+import Landing from './Components/Landing/Landing'
 
 ReactDOM.render(
   <Router>
