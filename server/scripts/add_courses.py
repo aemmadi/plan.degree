@@ -5,28 +5,6 @@ import re
 with open('archive/course_catalog_parsed.json') as f:
     data = json.load(f)
 
-"""
-{
-  _id: ObjectId(),
-  subj: CS,
-  num: 3305,
-  level: 3,
-  desc: "Description of the course",
-  title: "Discrete Math II"
-  course: CS 3305,
-  pre_req: [{tags: ["CS 2305", "CE 2305"]}, {tags: ["MATH 2414", "MATH 2419"]}],
-  co_req: [],
-  req_text: "Prerequisites: (CE 2305 or CS 2305) with a grade of C or better, and (MATH 2414 or MATH 2419)"
-  family: ["Computer Science"],
-  credits: 3,
-  required: true,
-  special: false, # upper (junior standing)
-  core: false # 040, 060, 080, etc
-}
-"""
-
-course_data = []
-
 
 def parse_archive(key, val):
     course = key
@@ -42,8 +20,8 @@ def parse_archive(key, val):
         for req in val["prerequisites"]:
             req_text += f"{req}; "
         req_text = req_text[:-2]
-    else:
-        req_text = val["prerequisites"]
+    elif len(val["prerequisites"]) > 0:
+        req_text = val["prerequisites"][0]
 
     # If credit is "v", cant confirm amount of credits (client should prompt user to verify credit hours for these classes)
     if not credit.isdigit():
@@ -149,4 +127,7 @@ for key in data:
 
     courses.append(tmp)
 
-print(courses)
+
+# PUSH TO DB
+# course_data = client["catalog_data"]["course_data"]
+# course_data.insert_many(courses)
