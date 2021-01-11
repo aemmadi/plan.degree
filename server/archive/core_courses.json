@@ -1,0 +1,11 @@
+{
+  "010": {"title": "Communication", "courses": ["ATCM 2340", "COMM 1311", "COMM 1315", "ECS 3390", "RHET 1302"]},
+  "020": {"title": "Mathematics", "courses": ["MATH 1306", "MATH 1314", "MATH 1316", "MATH 1325", "MATH 2306", "MATH 2312", "MATH 2413", "MATH 2414", "MATH 2415", "MATH 2417", "PHIL 2303", "PSY 2317", "STAT 1342", "STAT 2332"]},
+  "030": {"title": "Life and Physical Sciences", "courses": ["BIOL 1300", "BIOL 1318", "BIOL 2311", "BIOL 2312", "BIOL 2350", "CGS 2301", "CHEM 1311", "CHEM 1312", "CHEM 1315", "CHEM 1316", "ENVR 2302", "GEOG 2302", "GEOS 1303", "GEOS 1304", "GEOS 2302", "GEOS 2310", "GEOS 2321", "GEOS 2332", "GEOS 2333", "GEOS 2409", "ISNS 2359", "ISNS 2367", "ISNS 2368", "NATS 1311", "NATS 2330", "NATS 2333", "PHYS 1301", "PHYS 1302", "PHYS 2125", "PHYS 2325", "PHYS 2326", "PHYS 2421", "PHYS 2422", "PSY 2364"]},
+  "040": {"title": "Language, Philosophy and Culture", "courses": ["AMS 2300", "AMS 2341", "ATCM 2300", "FILM 1303", "HIST 2340", "HIST 2341", "HIST 2350", "HIST 2370", "HUMA 1301", "LIT 1301", "LIT 2329", "LIT 2331", "PHIL 1301", "PHIL 1305", "PHIL 1306", "PHIL 2316", "PHIL 2317"]},
+  "050": {"title": "Creative Arts", "courses": ["AHST 1303", "AHST 1304", "AHST 2331", "ARTS 1301", "DANC 1305", "DANC 1310", "FILM 2332", "MUSI 1306", "MUSI 2321", "MUSI 2322", "THEA 1310"]},
+  "060": {"title": "American History", "courses": ["HIST 1301", "HIST 1302", "HIST 2301", "HIST 2330", "HIST 2381", "HIST 2384"]},
+  "070": {"title": "Government/Political Science", "courses": ["GOVT 2107", "GOVT 2305", "GOVT 2306"]},
+  "080": {"title": "Social and Behavioral Sciences", "courses": ["BA 1310", "BA 1320", "CLDP 2314", "CRIM 1301", "CRIM 1307", "ECON 2301", "ECON 2302", "GEOG 2303", "GST 2300", "PA 2325", "PSY 2301", "PSY 2314", "SOC 1301", "SOC 2300", "SOC 2320"]},
+  "090": {"title": "Component Area", "courses": ["ARAB 2311", "ARAB 2312", "ARHM 2340", "ARHM 2342", "ARHM 2343", "ARHM 2344", "CHEM 1111", "CHEM 1115", "CHIN 2311", "CHIN 2312", "EPPS 2301", "EPPS 2302", "FREN 2311", "FREN 2312", "GERM 2311", "GERM 2312", "JAPN 2311", "JAPN 2312", "MATH 1326", "MATH 2419", "SPAN 2310", "SPAN 2311", "SPAN 2312"]}
+}
