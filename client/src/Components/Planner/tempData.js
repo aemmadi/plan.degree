@@ -8,17 +8,17 @@ const tempData = {
   rows: {
     'semester-1': {
       id: 'semester-1',
-      title: 'Fall 2021',
+      title: 'Semester 1',
       courseIds: ['course-1', 'course-2', 'course-3', 'course-4'],
     },
     'semester-2': {
       id: 'semester-2',
-      title: 'Spring 2022',
+      title: 'Semester 2',
       courseIds: [],
     },
     'semester-3': {
       id: 'semester-3',
-      title: 'Summer 2022',
+      title: 'Semester 3',
       courseIds: [],
     },
   },
