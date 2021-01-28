@@ -5,8 +5,23 @@ import {DragDropContext} from 'react-beautiful-dnd'
 
 import tempData from './tempData'
 import Semester from './components/semester'
+import Search from './components/search'
+import Info from './components/info'
 
+const Grid = styled.div`
+display: flex;
+justify-content: center;
+padding: .5rem;
+`
 const Container = styled.div``
+const Button = styled.button`
+margin-left: auto;
+margin-right: auto;
+border: 1px solid lightgrey;
+border-radius: 2px;
+
+display: block;
+`;
 
 class Planner extends React.Component {
   state = tempData
@@ -28,7 +43,7 @@ class Planner extends React.Component {
     const finish = this.state.rows[destination.droppableId];
 
     if(start === finish) {
-      const newTaskIds = Array.from(start.taskIds)
+      const newTaskIds = Array.from(start.courseIds)
       newTaskIds.splice(source.index, 1)
       newTaskIds.splice(destination.index, 0, draggableId);
   
@@ -76,18 +91,45 @@ class Planner extends React.Component {
     this.setState(newState)
   }
 
+  addNewSemester = () => {
+    const semCount = this.state.rowOrder.length
+    const newSem = {
+      id: `semester-${semCount+1}`,
+      title: `Semester ${semCount+1}`,
+      courseIds: []
+    }
+    const newRowOrder = this.state.rowOrder
+    newRowOrder.push(newSem.id)
+
+    const newState = {
+      ...this.state,
+      rows: {
+        ...this.state.rows,
+        [newSem.id]: newSem
+      },
+      rowOrder: newRowOrder
+    }
+
+    this.setState(newState)
+  }
+
   render() {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
+      <Grid>
+        <Search />
         <Container>
-          {this.state.rowOrder.map((rowId) => {
-            const row = this.state.rows[rowId];
-            const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
-      
-            return <Semester key={row.id} row={row} courses={courses} />
-          })}
+        <DragDropContext onDragEnd={this.onDragEnd}>
+            {this.state.rowOrder.map((rowId) => {
+              const row = this.state.rows[rowId];
+              const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
+        
+              return <Semester key={row.id} row={row} courses={courses} />
+            })}
+          <Button onClick={this.addNewSemester}>New Semester</Button>
+          </DragDropContext>
         </Container>
-      </DragDropContext>
+        <Info />
+      </Grid>
       )
   }
 }
