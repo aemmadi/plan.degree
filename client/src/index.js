@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import './index.css';
+import 'semantic-ui-css/semantic.min.css'
+
 import App from './App';
 import Landing from './Components/Landing/Landing'
 import Planner from './Components/Planner/Planner'
 
 ReactDOM.render(
   <Router>
-    <div>
       <Route exact path = "/">
         <Landing/>
       </Route>
@@ -19,7 +20,6 @@ ReactDOM.render(
       <Route exact path = "/demo">
         <Planner/>
       </Route>
-    </div>
   </Router>,
   document.getElementById('root')
 );
