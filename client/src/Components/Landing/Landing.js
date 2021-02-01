@@ -15,6 +15,7 @@ import {
   Sidebar,
   Visibility,
 } from 'semantic-ui-react'
+import {Link} from 'react-router-dom'
 
 const { MediaContextProvider, Media } = createMedia({
   breakpoints: {
@@ -50,7 +51,7 @@ const HomepageHeading = ({ mobile }) => (
         marginTop: mobile ? '0.5em' : '0.2em',
       }}
     />
-    <Button secondary size='huge'>
+    <Button as={Link} to="/app" secondary size='huge'>
       Get Started
       <Icon name='right arrow' />
     </Button>
