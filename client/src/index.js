@@ -14,7 +14,7 @@ ReactDOM.render(
       <Route exact path = "/">
         <Landing/>
       </Route>
-      <Route exact path = "/getting-started">
+      <Route exact path = "/app">
         <App/>
       </Route>
       <Route exact path = "/demo">
