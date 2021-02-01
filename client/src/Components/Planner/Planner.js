@@ -2,29 +2,34 @@ import React from 'react'
 import '@atlaskit/css-reset'
 import styled from 'styled-components'
 import {DragDropContext} from 'react-beautiful-dnd'
+import {Container, Button, Grid, Menu} from 'semantic-ui-react'
 
 import tempData from './tempData'
 import Semester from './components/semester'
 import Search from './components/search'
 import Info from './components/info'
 
-const Grid = styled.div`
-display: flex;
-justify-content: center;
-padding: .5rem;
-`
-const Container = styled.div``
-const Button = styled.button`
-margin-left: auto;
-margin-right: auto;
-border: 1px solid lightgrey;
-border-radius: 2px;
+// const Grid = styled.div`
+// display: flex;
+// justify-content: center;
+// padding: .5rem;
+// `
+// const Container = styled.div``
+// const Button = styled.button`
+// margin-left: auto;
+// margin-right: auto;
+// border: 1px solid lightgrey;
+// border-radius: 2px;
 
-display: block;
-`;
+// display: block;
+// `;
 
 class Planner extends React.Component {
-  state = tempData
+  constructor() {
+    super()
+    this.state = tempData
+  }
+
   onDragEnd = result => {
     const {destination, source, draggableId} = result;
 
@@ -115,21 +120,48 @@ class Planner extends React.Component {
 
   render() {
     return (
-      <Grid>
-        <Search />
-        <Container>
-        <DragDropContext onDragEnd={this.onDragEnd}>
-            {this.state.rowOrder.map((rowId) => {
-              const row = this.state.rows[rowId];
-              const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
-        
-              return <Semester key={row.id} row={row} courses={courses} />
-            })}
-          <Button onClick={this.addNewSemester}>New Semester</Button>
-          </DragDropContext>
-        </Container>
-        <Info />
-      </Grid>
+      <div id="planner">
+        <Menu style={{height: '4em'}}>
+          <Menu.Item name='dashboard'/>
+          <Menu.Item name='planner'/>
+          <Menu.Menu 
+            content="Plan.Degree" 
+            position='right'
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontFamily: 'sketch-3d',
+              fontSize: '2em',
+              fontWeight: 'light',
+              marginRight: '0.9em'
+          }}/>
+          <Menu.Menu position='right'>
+            <Menu.Item name='settings'/>
+            <Menu.Item
+              name='logout'
+              style={{
+                color: '#b23b3b'
+              }}
+            />
+          </Menu.Menu>
+        </Menu>
+        <Grid>
+          <Search />
+          <Container>
+          <DragDropContext onDragEnd={this.onDragEnd}>
+              {this.state.rowOrder.map((rowId) => {
+                const row = this.state.rows[rowId];
+                const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
+          
+                return <Semester key={row.id} row={row} courses={courses} />
+              })}
+            <Button onClick={this.addNewSemester}>New Semester</Button>
+            </DragDropContext>
+          </Container>
+          <Info />
+        </Grid>
+      </div>
       )
   }
 }
