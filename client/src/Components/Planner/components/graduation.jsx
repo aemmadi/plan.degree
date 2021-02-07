@@ -16,11 +16,11 @@ import {Container} from 'semantic-ui-react'
 // `;
 
 
-export default class Info extends React.Component {
+export default class Graduation extends React.Component {
   render() {
     return (
-      <Container>
-        <center><h1>Course Details</h1></center>
+      <Container style={{height: '500px'}}>
+        <center><h1>Degree Progress</h1></center>
       </Container>
     )
   }

@@ -2,12 +2,14 @@ import React from 'react'
 import '@atlaskit/css-reset'
 import styled from 'styled-components'
 import {DragDropContext} from 'react-beautiful-dnd'
-import {Container, Button, Grid, Menu} from 'semantic-ui-react'
+import {Container, Button, Grid} from 'semantic-ui-react'
 
 import tempData from './tempData'
 import Semester from './components/semester'
 import Search from './components/search'
 import Info from './components/info'
+import Graduation from './components/graduation'
+import Navbar from '../Core/Navbar'
 
 // const Grid = styled.div`
 // display: flex;
@@ -121,45 +123,39 @@ class Planner extends React.Component {
   render() {
     return (
       <div id="planner">
-        <Menu style={{height: '4em'}}>
-          <Menu.Item name='dashboard'/>
-          <Menu.Item name='planner'/>
-          <Menu.Menu 
-            content="Plan.Degree" 
-            position='right'
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontFamily: 'sketch-3d',
-              fontSize: '2em',
-              fontWeight: 'light',
-              marginRight: '0.9em'
-          }}/>
-          <Menu.Menu position='right'>
-            <Menu.Item name='settings'/>
-            <Menu.Item
-              name='logout'
-              style={{
-                color: '#b23b3b'
-              }}
-            />
-          </Menu.Menu>
-        </Menu>
-        <Grid>
-          <Search />
-          <Container>
-          <DragDropContext onDragEnd={this.onDragEnd}>
-              {this.state.rowOrder.map((rowId) => {
-                const row = this.state.rows[rowId];
-                const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
-          
-                return <Semester key={row.id} row={row} courses={courses} />
-              })}
-            <Button onClick={this.addNewSemester}>New Semester</Button>
-            </DragDropContext>
-          </Container>
-          <Info />
+        <Navbar />
+        <Grid style={{margin: '1em 1em 1em 1em'}}>
+          <Grid.Row>
+            <Grid.Column width={4}>
+              <Grid.Row>
+                <Search />
+              </Grid.Row>
+              <Grid.Row>
+                <Info />
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Column width={8}>
+              <Container style={{marginTop: '1em'}}>
+                <div style={{marginBottom: '1em'}}>
+                  <Button onClick={this.addNewSemester}>New Semester</Button>{' '}
+                  <Button disabled>Export Plan as PDF</Button>{' '}
+                  <Button disabled>Validate Plan</Button>{' '}
+                  <Button disabled>Save Plan</Button>{' '}
+                </div>
+                <DragDropContext onDragEnd={this.onDragEnd}>
+                    {this.state.rowOrder.map((rowId) => {
+                      const row = this.state.rows[rowId];
+                      const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
+                
+                      return <Semester key={row.id} row={row} courses={courses} />
+                  })}
+                </DragDropContext>
+              </Container>
+            </Grid.Column>
+            <Grid.Column width={4}>
+              <Graduation />
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </div>
       )
