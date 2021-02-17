@@ -2,11 +2,11 @@ import React from 'react'
 import '@atlaskit/css-reset'
 import styled from 'styled-components'
 import {DragDropContext} from 'react-beautiful-dnd'
-import {Container, Button, Grid} from 'semantic-ui-react'
+import {Container, Button, Grid, Card} from 'semantic-ui-react'
 
 import tempData from './tempData'
 import Semester from './components/semester'
-import Search from './components/search'
+import Add from './components/add'
 import Info from './components/info'
 import Graduation from './components/graduation'
 import Navbar from '../Core/Navbar'
@@ -128,7 +128,7 @@ class Planner extends React.Component {
           <Grid.Row>
             <Grid.Column width={4}>
               <Grid.Row>
-                <Search />
+                <Add />
               </Grid.Row>
               <Grid.Row>
                 <Info />
@@ -142,14 +142,16 @@ class Planner extends React.Component {
                   <Button disabled>Validate Plan</Button>{' '}
                   <Button disabled>Save Plan</Button>{' '}
                 </div>
-                <DragDropContext onDragEnd={this.onDragEnd}>
-                    {this.state.rowOrder.map((rowId) => {
-                      const row = this.state.rows[rowId];
-                      const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
-                
-                      return <Semester key={row.id} row={row} courses={courses} />
-                  })}
-                </DragDropContext>
+                <Card.Group>
+                  <DragDropContext onDragEnd={this.onDragEnd}>
+                      {this.state.rowOrder.map((rowId) => {
+                        const row = this.state.rows[rowId];
+                        const courses = row.courseIds.map(courseId => this.state.courses[courseId]);
+                  
+                        return <Semester key={row.id} row={row} courses={courses} />
+                    })}
+                  </DragDropContext>
+                </Card.Group>
               </Container>
             </Grid.Column>
             <Grid.Column width={4}>
