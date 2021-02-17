@@ -30,15 +30,15 @@ display: flex;
 export default class Semester extends React.Component {
   render() {
     return (
-    <Card.Group>
-      <Card fluid>
-        <Card fluid header={this.props.row.title} style={{margin: '0px auto'}}/>
+      <Card fluid >
+        <Card fluid header={this.props.row.title} style={{margin: '0em auto'}}/>
         <Droppable droppableId={this.props.row.id} direction="horizontal">
           {(provided, snapshot) => (
           <CourseList
             ref={provided.innerRef}
             {...provided.droppableProps}
-            isDraggingOver={snapshot.isDraggingOver}  
+            isDraggingOver={snapshot.isDraggingOver}
+             
           >
               {this.props.courses.map((course, index) => (<Course key={course.id} course={course} index={index}/>
             ))}
@@ -46,8 +46,10 @@ export default class Semester extends React.Component {
           </CourseList>
           )}
         </Droppable>
+        <Card fluid>
+          <Card.Meta textAlign="right" style={{margin: '0.2em auto'}}>Credits: 0 Hours</Card.Meta>
+        </Card>
       </Card>
-    </Card.Group>
     )
   }
 }
