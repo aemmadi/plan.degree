@@ -1,7 +1,7 @@
 from flask import Flask, json, request, make_response, jsonify, redirect
 from flask_cors import CORS, cross_origin
 from db import client
-from utils import format_tag, parse_json, set_headers
+from utils import format_tag, parse_json, set_headers, generate_random_token
 import mailgun
 from bson.objectid import ObjectId
 import sys
@@ -19,13 +19,14 @@ def hello():
 def create_user():
     error = False
     form_data = request.get_json()
-    new_user = client["users"]["pending"]
+    pending_users = client["users"]["pending"]
+    verified_users = client["users"]["verified"]
 
-    if new_user.find_one({'email': form_data["email"]}):
+    if pending_users.find_one({'email': form_data["email"]}) or verified_users.find_one({'email': form_data["email"]}):
         error = True
     else:
         try:
-            user = new_user.insert_one(form_data)
+            user = pending_users.insert_one(form_data)
         except:
             error = True
     
@@ -34,32 +35,41 @@ def create_user():
             jsonify({'data': 'error'}), 400
         )
     
-    mailgun.send_confirmation(form_data["firstName"], form_data["email"], f"http://localhost:5000/auth/confirm/{user.inserted_id}")
+    token = generate_random_token()
+    mailgun.send_confirmation(
+        form_data["firstName"], 
+        form_data["email"], 
+        f"http://localhost:5000/auth/confirm/{token}/{user.inserted_id}"
+    )
+
     res = make_response(
         jsonify({'data': 'success'}), 200
     )
     res = set_headers(res)
     return res
 
-@app.route('/auth/confirm/<id>', methods=["GET"])
-def confirm_user(id):
+@app.route('/auth/confirm/<token>/<id>', methods=["GET"])
+def confirm_user(token, id):
     error = False
     pending_users = client["users"]["pending"]
     verified_users = client["users"]["verified"]
 
     try:
         user = pending_users.find_one({'_id': ObjectId(id)})
-        print(user, file=sys.stderr)
-        if user:
+        existing_user = verified_users.find_one({'_id': ObjectId(id)})
+     
+        if user and not existing_user:
             user.update({"isOnboarding": True})
             verified_users.insert_one(user)
             pending_users.delete_one({'_id': ObjectId(id)})
+        else:
+            error = True
     except:
         error = True
     
     if error:
-        return redirect("http://localhost:3000/auth/confirm/error", code=400)
-    return redirect("http://localhost:3000/auth/confirm/success", code=200)
+        return redirect("http://localhost:3000/auth/confirm/error", code=302)
+    return redirect("http://localhost:3000/auth/confirm/success", code=302)
 
 @app.route('/course/<tag>')
 def get_course(tag):
