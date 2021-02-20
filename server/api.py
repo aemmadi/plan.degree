@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 from db import client
 from utils import format_tag, parse_json, set_headers, generate_random_token
 import mailgun
+import traceback
 from bson.objectid import ObjectId
 import sys
 
@@ -70,6 +71,45 @@ def confirm_user(token, id):
     if error:
         return redirect("http://localhost:3000/auth/confirm/error", code=302)
     return redirect("http://localhost:3000/auth/confirm/success", code=302)
+
+@app.route('/auth/confirm/resend-email/', methods=["POST"])
+@cross_origin()
+def resend_confirm_email():
+    form_data = request.get_json()
+    error = False
+    pending_users = client["users"]["pending"]
+    verified_users = client["users"]["verified"]
+
+    try:
+        user = pending_users.find_one({'email': form_data["email"]})
+        existing_user = verified_users.find_one({'email': form_data["email"]})
+
+        if user and not existing_user:
+            form_data["firstName"] = user["firstName"]
+            token = generate_random_token()
+            mailgun.send_confirmation(
+                form_data["firstName"], 
+                form_data["email"], 
+                f"http://localhost:5000/auth/confirm/{token}/{user['_id']}"
+            )
+        else:
+            error = True
+    except:
+        error = True
+    
+    if error:
+        res = make_response(
+            jsonify({'data': 'error'}), 400
+        )
+        res = set_headers(res)
+        return res
+    
+    res = make_response(
+            jsonify({'data': 'success'}), 200
+        )
+    res = set_headers(res)
+    return res
+    
 
 @app.route('/course/<tag>')
 def get_course(tag):

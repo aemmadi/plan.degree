@@ -8,6 +8,7 @@ import 'semantic-ui-css/semantic.min.css'
 import Login from './Components/Auth/Login'
 import SignUp from './Components/Auth/SignUp'
 import Confirm from './Components/Auth/Confirm'
+import ResendConfirm from './Components/Auth/ResendConfirm'
 import App from './App';
 import Landing from './Components/Landing/Landing'
 import Planner from './Components/Planner/Planner'
@@ -28,6 +29,9 @@ ReactDOM.render(
       </Route>
       <Route exact path = "/auth/confirm/error">
         <Confirm success={false}/>
+      </Route>
+      <Route exact path = "/resend-confirmation">
+        <ResendConfirm/>
       </Route>
       <Route exact path = "/app">
         <App/>
