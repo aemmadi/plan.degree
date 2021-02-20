@@ -13,7 +13,7 @@ const SignUp = () => {
     const formData = e.target.form
     const firstName = formData[0].value.charAt(0).toUpperCase() + formData[0].value.slice(1).toLowerCase()
     const lastName = formData[1].value.charAt(0).toUpperCase() + formData[1].value.slice(1).toLowerCase()
-    const email = formData[2].value
+    const email = formData[2].value.toLowerCase()
     const initialPassword = formData[3].value
     const confirmPassword = formData[4].value
 
