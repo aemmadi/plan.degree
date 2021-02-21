@@ -39,6 +39,9 @@ const Login = () => (
         </Segment>
       </Form>
       <Message>
+        Forgot your password? <Link to="/reset-password">Reset</Link>
+      </Message>
+      <Message>
         Don't have an account? <Link to="/signup">Sign Up</Link>
       </Message>
     </Grid.Column>

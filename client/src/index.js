@@ -9,6 +9,7 @@ import Login from './Components/Auth/Login'
 import SignUp from './Components/Auth/SignUp'
 import Confirm from './Components/Auth/Confirm'
 import ResendConfirm from './Components/Auth/ResendConfirm'
+import ResetPassword from './Components/Auth/ResetPassword'
 import App from './App';
 import Landing from './Components/Landing/Landing'
 import Planner from './Components/Planner/Planner'
@@ -32,6 +33,12 @@ ReactDOM.render(
       </Route>
       <Route exact path = "/resend-confirmation">
         <ResendConfirm/>
+      </Route>
+      <Route exact path = "/reset-password">
+        <ResetPassword/>
+      </Route>
+      <Route exact path = "/reset-password/:token/:id">
+        <ResetPassword renderForm={true}/>
       </Route>
       <Route exact path = "/app">
         <App/>

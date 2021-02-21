@@ -4,12 +4,16 @@ from db import client
 from utils import format_tag, parse_json, set_headers, generate_random_token
 import mailgun
 import traceback
+from datetime import datetime
 from bson.objectid import ObjectId
 import sys
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+pending_users = client["users"]["pending"]
+verified_users = client["users"]["verified"]
 
 @app.route('/')
 def hello():
@@ -20,8 +24,6 @@ def hello():
 def create_user():
     error = False
     form_data = request.get_json()
-    pending_users = client["users"]["pending"]
-    verified_users = client["users"]["verified"]
 
     if pending_users.find_one({'email': form_data["email"]}) or verified_users.find_one({'email': form_data["email"]}):
         error = True
@@ -52,8 +54,6 @@ def create_user():
 @app.route('/auth/confirm/<token>/<id>', methods=["GET"])
 def confirm_user(token, id):
     error = False
-    pending_users = client["users"]["pending"]
-    verified_users = client["users"]["verified"]
 
     try:
         user = pending_users.find_one({'_id': ObjectId(id)})
@@ -77,8 +77,6 @@ def confirm_user(token, id):
 def resend_confirm_email():
     form_data = request.get_json()
     error = False
-    pending_users = client["users"]["pending"]
-    verified_users = client["users"]["verified"]
 
     try:
         user = pending_users.find_one({'email': form_data["email"]})
@@ -109,7 +107,127 @@ def resend_confirm_email():
         )
     res = set_headers(res)
     return res
+
+@app.route('/auth/password-reset/', methods=["POST"])
+@cross_origin()
+def password_reset():
+    form_data = request.get_json()
+    error = False
+
+    try:
+        user = verified_users.find_one({"email": form_data["email"]})
+        if user is not None:
+            form_data["firstName"] = user["firstName"]
+            token = generate_random_token()
+            created_at = datetime.now()
+
+            verified_users.update_one(
+                user, 
+                {"$set": {
+                    "password_reset_timestamp": created_at,
+                    "password_reset_token": token
+                    }
+                }
+            )
+
+            mailgun.send_password_reset(
+                form_data["firstName"],
+                form_data["email"],
+                f"http://localhost:3000/reset-password/{token}/{user['_id']}"
+            )
+        elif pending_users.find_one({"email": form_data["email"]}) is not None:
+            res = make_response(
+                jsonify(
+                    {"data": "unconfirmed"}
+                ), 400
+                )
+
+            res = set_headers(res)
+            return res
+        else:
+            error = True
+    except:
+        error = True
     
+    if error:
+        res = make_response(
+            jsonify({'data': 'error'}), 400
+        )
+        res = set_headers(res)
+        return res
+    
+    res = make_response(
+            jsonify({'data': 'success'}), 200
+        )
+    res = set_headers(res)
+    return res
+
+# Verify user token and id
+def verify_user(token, id):
+    error = False
+    try:
+        user = verified_users.find_one({"_id": ObjectId(id)})
+        if user is not None:
+            if token == user["password_reset_token"]:
+                request_time = user["password_reset_timestamp"]
+                current_time = datetime.now()
+
+                time_taken = (current_time - request_time).total_seconds() / 60.0
+                if time_taken >= 60.0:
+                    error = True
+            else:
+                error = True
+        else:
+            error = True
+    except:
+        error = True
+
+    return not error
+
+@app.route("/auth/password-reset/<token>/<id>", methods=["GET", "POST"])
+@cross_origin()
+def update_password(token, id):
+    if request.method == "GET":
+        isVerified = verify_user(token, id)
+        if isVerified == True:
+            res = make_response(
+                jsonify({'data': 'verified'}), 200
+            )
+            res = set_headers(res)
+            return res
+        else:
+            res = make_response(
+                jsonify({'data': 'error'}), 400
+            )
+            res = set_headers(res)
+            return res
+    elif request.method == "POST":
+        isVerified = verify_user(token, id)
+        error = False
+
+        if isVerified == True:
+            form_data = request.get_json()
+            try:
+                verified_users.update_one({"_id": ObjectId(id)}, 
+                    {
+                        "$set": {"password": form_data["password"]},
+                        "$unset": {"password_reset_token": "", "password_reset_timestamp": ""}
+                })
+            except:
+                error = True
+        
+        if isVerified == False or error == True:
+            res = make_response(
+                jsonify({'data': 'error'}), 400
+            )
+            res = set_headers(res)
+            return res
+        
+        res = make_response(
+                jsonify({'data': 'success'}), 200
+            )
+        res = set_headers(res)
+        return res
 
 @app.route('/course/<tag>')
 def get_course(tag):
