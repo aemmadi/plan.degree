@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {Link} from 'react-router-dom'
 import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 
-import { hashPassword } from './crypt'
+import { GenerateHashWithSalt } from './crypt'
 
 const SignUp = () => {
   const [success, setSuccess] = useState(null)
@@ -39,7 +39,7 @@ const SignUp = () => {
     }
 
     if(emailFlag && passFlag) {
-        const password = hashPassword(initialPassword);
+        const password = GenerateHashWithSalt(initialPassword);
         (async () => {
             const payload = {
               firstName: firstName,
@@ -62,7 +62,7 @@ const SignUp = () => {
             if(content.data === "success"){
               setSuccess(true)
             }
-            else if(content.data === "error"){
+            else {
               setSuccess(false)
             }
           }

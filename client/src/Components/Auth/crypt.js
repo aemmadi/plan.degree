@@ -1,8 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
-const SHA256 = require("crypto-js/sha256")
+const CryptoJS = require("crypto-js")
 
-export function hashPassword(password) {
+export function GenerateHashWithSalt(msg) {
     const salt = uuidv4()
-    const hash = SHA256(salt + password) + ":" + salt
-    return hash
+    const hash = CryptoJS.SHA256(msg)
+    return {
+        hash: CryptoJS.SHA256(salt) + hash,
+        salt: salt
+    }
+}
+
+export function GenerateHash(msg) {
+    return CryptoJS.SHA256(msg) + ""
 }

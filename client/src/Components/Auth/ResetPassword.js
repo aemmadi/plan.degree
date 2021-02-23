@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import {Link, useParams} from 'react-router-dom'
 import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
-import { hashPassword } from './crypt'
+import { GenerateHashWithSalt } from './crypt'
 
-const ResendConfirm = (props) => {
+const ResetPassword = (props) => {
   const [success, setSuccess] = useState(null)
   const [isVerified, setIsVerified] = useState(null)
   const [isPasswordValid, setIsPasswordValid] = useState(null)
@@ -49,7 +49,7 @@ const ResendConfirm = (props) => {
 
       if(passFlag) {
         (async () => {
-          const password = hashPassword(initialPassword)
+          const password = GenerateHashWithSalt(initialPassword)
           const payload = {
             password: password
           }
@@ -278,4 +278,4 @@ const ResendConfirm = (props) => {
   }
 }
 
-export default ResendConfirm
+export default ResetPassword
