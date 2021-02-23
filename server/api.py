@@ -1,7 +1,7 @@
 from flask import Flask, json, request, make_response, jsonify, redirect
 from flask_cors import CORS, cross_origin
 from db import client
-from utils import format_tag, parse_json, set_headers, generate_random_token
+from utils import format_tag, parse_json, set_headers, generate_random_token, generate_hash
 import mailgun
 import traceback
 from datetime import datetime
@@ -18,6 +18,49 @@ verified_users = client["users"]["verified"]
 @app.route('/')
 def hello():
     return "Hello, World!"
+
+@app.route('/auth/login/', methods=["POST"])
+@cross_origin()
+def login_user():
+    error = False
+    form_data = request.get_json()
+    email = form_data["email"]
+    password = form_data["password"]
+
+    try:
+        if pending_users.find_one({'email': email}):
+            return make_response(
+                jsonify({'data': 'unconfirmed'}), 400
+            )
+        user = verified_users.find_one({'email': email})
+        if user is not None:
+            salt = user["password"]["salt"]
+            password = generate_hash(salt) + password
+            if password == user["password"]["hash"]:
+                session = {
+                    "token": generate_random_token(),
+                    "created_at": datetime.now()
+                }
+                verified_users.update_one(user, {"$set": { "session": session }})
+            else:
+                error = True
+        else:
+            error = True
+    except:
+        error = True
+
+    if error:
+        return make_response(
+            jsonify({'data': 'error'}), 400
+        )
+    
+    res = make_response(
+        jsonify({'data': session["token"]}), 200
+    )
+    res = set_headers(res)
+    return res
+
+
 
 @app.route('/auth/signup/', methods=["POST"])
 @cross_origin()
