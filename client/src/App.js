@@ -1,26 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {Button, Card, Container, Header, Icon, Input, Menu} from 'semantic-ui-react'
-import {Link} from 'react-router-dom'
+import {Link, useParams} from 'react-router-dom'
 
 import Navbar from './Components/Core/Navbar'
-import Logout from './Components/Core/Logout'
-export default class App extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      loggedInUser: 'Bob Smith'
-    }
+
+const App = (props) => {
+  const [user, setUser] = useState(null)
+  const [activeItem, setActiveItem] = useState("dashboard")
+  const {token, id} = useParams() 
+
+  if (props.isAuth === true) {
+    
   }
 
-  componentDidMount() {
-
+  const handleItemClick = (e, {name}) => {
+    setActiveItem(name)
   }
 
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
-
-  render() {
-    return (
-      <div id="app">
+  return (
+    <div id="app">
         <Navbar />
         <Container>
           <Header 
@@ -47,6 +45,7 @@ export default class App extends React.Component {
           </Card.Group>
         </Container>
       </div>
-    )
-  }
+  )
 }
+
+export default App
