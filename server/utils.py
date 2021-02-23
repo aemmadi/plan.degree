@@ -3,7 +3,6 @@ from bson import json_util
 import hashlib
 import uuid
 
-
 def format_tag(tag):
     return tag.upper()
 
@@ -19,3 +18,7 @@ def set_headers(res):
 def generate_random_token():
     id = uuid.uuid4().hex.encode('utf-8')
     return hashlib.sha256(id).hexdigest()
+
+def generate_hash(msg):
+    msg = msg.encode('utf-8')
+    return hashlib.sha256(msg).hexdigest()
