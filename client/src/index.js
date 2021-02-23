@@ -40,8 +40,8 @@ ReactDOM.render(
       <Route exact path = "/reset-password/:token/:id">
         <ResetPassword renderForm={true}/>
       </Route>
-      <Route exact path = "/app">
-        <App/>
+      <Route exact path = "/app/:session">
+        <App isAuth={true}/>
       </Route>
       <Route exact path = "/demo">
         <Planner/>

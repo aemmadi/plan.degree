@@ -7,10 +7,10 @@ import Navbar from './Components/Core/Navbar'
 const App = (props) => {
   const [user, setUser] = useState(null)
   const [activeItem, setActiveItem] = useState("dashboard")
-  const {token, id} = useParams() 
+  const {session} = useParams() 
 
   if (props.isAuth === true) {
-    
+    return <App />
   }
 
   const handleItemClick = (e, {name}) => {
