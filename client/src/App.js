@@ -8,12 +8,13 @@ export default class App extends React.Component {
   constructor() {
     super()
     this.state = {
-      loggedInUser: 'Bob Smith'
+      loggedInUser: 'Bob Smith',
+      courses: {},
     }
   }
 
   componentDidMount() {
-
+  
   }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
