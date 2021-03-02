@@ -32,6 +32,15 @@ class Planner extends React.Component {
     this.state = tempData
   }
 
+  componentDidMount(){
+     // api calls
+     fetch('http://127.0.0.1:5000/course/search/all').then(res => res.json()).then(data => {
+      this.setState({
+        classes: data?.results
+      })
+    })
+  }
+
   onDragEnd = result => {
     const {destination, source, draggableId} = result;
 
@@ -128,7 +137,7 @@ class Planner extends React.Component {
           <Grid.Row>
             <Grid.Column width={4}>
               <Grid.Row>
-                <Add />
+                <Add classes={this.state.classes} />
               </Grid.Row>
               <Grid.Row>
                 <Info />
