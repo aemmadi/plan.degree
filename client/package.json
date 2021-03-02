@@ -11,6 +11,7 @@
     "crypto-js": "^4.0.0",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.0.0",
+    "react-cookie": "^4.0.3",
     "react-dom": "^17.0.1",
     "react-landing-page": "^2.0.2",
     "react-router": "^5.2.0",

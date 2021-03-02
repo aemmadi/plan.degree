@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import {Link, useHistory} from 'react-router-dom'
+import {useCookies} from 'react-cookie'
 import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 import { GenerateHash } from './crypt'
 
 const Login = () => {
+  const [cookie, setCookie] = useCookies(["session"])
   const [success, setSuccess] = useState(null)
-  const [isEmailValid, setIsEmailValid] = useState(false)
+  const [isEmailValid, setIsEmailValid] = useState(null)
   const history = useHistory()
 
   const ValidateForm = (e) => {
@@ -14,6 +16,7 @@ const Login = () => {
     const password = GenerateHash(formData[1].value)
 
     let emailFlag = false
+    setIsEmailValid(false)
 
     if(email.includes("@")) {
       const domain = email.split("@")[1]
@@ -45,8 +48,13 @@ const Login = () => {
           setSuccess(false)
         }
         else {
-          const sessionId = content.data
-          return history.push(`/app/${sessionId}`)
+          const sessionId = content.data.session
+          const sessionAge = 60 * 60 * 1000 // 1000 hours
+
+          setCookie("session", sessionId, {
+            path: "/",
+          })
+          history.push("/app")
         }
       }
     )()
@@ -118,6 +126,7 @@ const Login = () => {
             </Button>
           </Segment>
         </Form>
+        {RenderSubmitStatus()}
         <Message>
           Forgot your password? <Link to="/reset-password">Reset</Link>
         </Message>

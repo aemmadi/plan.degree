@@ -1,17 +1,35 @@
 import React, { useState } from 'react'
 import {Button, Card, Container, Header, Icon, Input, Menu} from 'semantic-ui-react'
-import {Link, useParams} from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
+import {useCookies} from 'react-cookie'
 
 import Navbar from './Components/Core/Navbar'
+import { getSessionId } from './util'
 
-const App = (props) => {
+const App = () => {
+  const [cookie, setCookie] = useCookies()
   const [user, setUser] = useState(null)
   const [activeItem, setActiveItem] = useState("dashboard")
-  const {session} = useParams() 
+  const history = useHistory()
 
-  if (props.isAuth === true) {
-    return <App />
+  const sessionId = getSessionId(cookie)
+  if(!sessionId) {
+    history.push("/login")
   }
+
+  (async () => {
+    const response = await fetch(`/session/${sessionId}`, {
+        method: "GET",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          "Access-Control-Allow-Origin": "*"
+        }
+      })
+
+    const content = await response.json()
+    console.log(content.data)
+  })()
 
   const handleItemClick = (e, {name}) => {
     setActiveItem(name)
