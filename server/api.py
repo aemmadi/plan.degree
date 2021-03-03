@@ -14,10 +14,47 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 pending_users = client["users"]["pending"]
 verified_users = client["users"]["verified"]
+open_sessions = client["sessions"]["open"]
+
 
 @app.route('/')
 def hello():
     return "Hello, World!"
+
+
+@app.route('/session/<session_id>')
+def get_user_from_session(session_id):
+    error = False
+    try:
+        session = open_sessions.find_one({'session.token': session_id})
+        if session is not None:
+            user_id = session["user"]["id"]
+            user = verified_users.find_one({'_id': ObjectId(user_id)}, [
+                                           'firstName', 'lastName', 'email', 'isOnboarding', 'data'])
+
+            if user is not None:
+                res = make_response(
+                    jsonify(
+                        {'data': user}, 200
+                    )
+                )
+                res = set_headers(res)
+                return res
+            else:
+                error = True
+        else:
+            error = True
+    except:
+        error = True
+
+    if(error):
+        res = make_response(
+            jsonify(
+                {'data': 'error'}), 400
+        )
+        res = set_headers(res)
+        return res
+
 
 @app.route('/auth/login/', methods=["POST"])
 @cross_origin()
@@ -41,25 +78,42 @@ def login_user():
                     "token": generate_random_token(),
                     "created_at": datetime.now()
                 }
-                verified_users.update_one(user, {"$set": { "session": session }})
+
+                open_sessions.insert_one({
+                    'session': session,
+                    'user': {
+                        'id': user['_id'],
+                        'email': user['email']
+                    }
+                })
+
+                if user.get("session"):
+                    session_list = user["session"]
+                    session_list.append(session)
+                    verified_users.update_one(
+                        user, {"$set": {"session": session_list}})
+                else:
+                    verified_users.update_one(
+                        user, {"$set": {"session": [session]}})
             else:
                 error = True
         else:
             error = True
     except:
+        traceback.print_exc()
         error = True
 
     if error:
         return make_response(
             jsonify({'data': 'error'}), 400
         )
-    
+
     res = make_response(
-        jsonify({'data': session["token"]}), 200
+        jsonify(
+            {'data': {'session': session["token"], 'token': generate_random_token()}}), 200
     )
     res = set_headers(res)
     return res
-
 
 
 @app.route('/auth/signup/', methods=["POST"])
@@ -75,16 +129,16 @@ def create_user():
             user = pending_users.insert_one(form_data)
         except:
             error = True
-    
+
     if(error):
         return make_response(
             jsonify({'data': 'error'}), 400
         )
-    
+
     token = generate_random_token()
     mailgun.send_confirmation(
-        form_data["firstName"], 
-        form_data["email"], 
+        form_data["firstName"],
+        form_data["email"],
         f"http://localhost:5000/auth/confirm/{token}/{user.inserted_id}"
     )
 
@@ -94,6 +148,7 @@ def create_user():
     res = set_headers(res)
     return res
 
+
 @app.route('/auth/confirm/<token>/<id>', methods=["GET"])
 def confirm_user(token, id):
     error = False
@@ -101,7 +156,7 @@ def confirm_user(token, id):
     try:
         user = pending_users.find_one({'_id': ObjectId(id)})
         existing_user = verified_users.find_one({'_id': ObjectId(id)})
-     
+
         if user and not existing_user:
             user.update({"isOnboarding": True})
             verified_users.insert_one(user)
@@ -110,10 +165,11 @@ def confirm_user(token, id):
             error = True
     except:
         error = True
-    
+
     if error:
         return redirect("http://localhost:3000/auth/confirm/error", code=302)
     return redirect("http://localhost:3000/auth/confirm/success", code=302)
+
 
 @app.route('/auth/confirm/resend-email/', methods=["POST"])
 @cross_origin()
@@ -128,28 +184,32 @@ def resend_confirm_email():
         if user and not existing_user:
             form_data["firstName"] = user["firstName"]
             token = generate_random_token()
+            print(token, file=sys.stderr)
+            print(user['_id'], file=sys.stderr)
             mailgun.send_confirmation(
-                form_data["firstName"], 
-                form_data["email"], 
+                form_data["firstName"],
+                form_data["email"],
                 f"http://localhost:5000/auth/confirm/{token}/{user['_id']}"
             )
         else:
             error = True
     except:
+        traceback.print_exc()
         error = True
-    
+
     if error:
         res = make_response(
             jsonify({'data': 'error'}), 400
         )
         res = set_headers(res)
         return res
-    
+
     res = make_response(
-            jsonify({'data': 'success'}), 200
-        )
+        jsonify({'data': 'success'}), 200
+    )
     res = set_headers(res)
     return res
+
 
 @app.route('/auth/password-reset/', methods=["POST"])
 @cross_origin()
@@ -165,11 +225,11 @@ def password_reset():
             created_at = datetime.now()
 
             verified_users.update_one(
-                user, 
+                user,
                 {"$set": {
                     "password_reset_timestamp": created_at,
                     "password_reset_token": token
-                    }
+                }
                 }
             )
 
@@ -183,7 +243,7 @@ def password_reset():
                 jsonify(
                     {"data": "unconfirmed"}
                 ), 400
-                )
+            )
 
             res = set_headers(res)
             return res
@@ -191,21 +251,23 @@ def password_reset():
             error = True
     except:
         error = True
-    
+
     if error:
         res = make_response(
             jsonify({'data': 'error'}), 400
         )
         res = set_headers(res)
         return res
-    
+
     res = make_response(
-            jsonify({'data': 'success'}), 200
-        )
+        jsonify({'data': 'success'}), 200
+    )
     res = set_headers(res)
     return res
 
 # Verify user token and id
+
+
 def verify_user(token, id):
     error = False
     try:
@@ -215,7 +277,8 @@ def verify_user(token, id):
                 request_time = user["password_reset_timestamp"]
                 current_time = datetime.now()
 
-                time_taken = (current_time - request_time).total_seconds() / 60.0
+                time_taken = (
+                    current_time - request_time).total_seconds() / 60.0
                 if time_taken >= 60.0:
                     error = True
             else:
@@ -226,6 +289,7 @@ def verify_user(token, id):
         error = True
 
     return not error
+
 
 @app.route("/auth/password-reset/<token>/<id>", methods=["GET", "POST"])
 @cross_origin()
@@ -251,26 +315,27 @@ def update_password(token, id):
         if isVerified == True:
             form_data = request.get_json()
             try:
-                verified_users.update_one({"_id": ObjectId(id)}, 
-                    {
-                        "$set": {"password": form_data["password"]},
-                        "$unset": {"password_reset_token": "", "password_reset_timestamp": ""}
+                verified_users.update_one({"_id": ObjectId(id)},
+                                          {
+                    "$set": {"password": form_data["password"]},
+                    "$unset": {"password_reset_token": "", "password_reset_timestamp": ""}
                 })
             except:
                 error = True
-        
+
         if isVerified == False or error == True:
             res = make_response(
                 jsonify({'data': 'error'}), 400
             )
             res = set_headers(res)
             return res
-        
+
         res = make_response(
-                jsonify({'data': 'success'}), 200
-            )
+            jsonify({'data': 'success'}), 200
+        )
         res = set_headers(res)
         return res
+
 
 @app.route('/course/<tag>')
 def get_course(tag):
