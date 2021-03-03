@@ -22,9 +22,10 @@ export default class Add extends React.Component {
     }
   }
 
+  
+
   handleSearch = (e) => {
     let exp = e.target.value
-    console.log(exp)
 
     this.setState({
       loading: true
@@ -43,8 +44,6 @@ export default class Add extends React.Component {
       results: arr,
       loading: false
     })
-    console.log(arr)
-
   }
   
   render() {
@@ -57,6 +56,7 @@ export default class Add extends React.Component {
             loading={this.state.loading}
             showNoResults={true}
             onSearchChange={this.handleSearch}
+            onResultSelect={this.props.onSelect}
             style={{marginTop: '1em'}}
             results={this.state.results}
           />

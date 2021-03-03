@@ -129,7 +129,45 @@ class Planner extends React.Component {
     this.setState(newState)
   }
 
+  handleSelect = (e, data) => {
+    let selected = data.result.title
+    let terms = this.state.rows
+
+    let tmp = {
+      id: selected,
+      content: selected
+    }
+
+    let courses = this.state.courses
+    courses[selected] = tmp
+
+    this.setState({
+      courses: courses
+    })
+
+    let keys = Object.keys(terms)
+
+    // ** Possible bug: no terms added yet, this code will not create a term to add the course too
+
+    // add to latest term w/ classes. Ex. no classes added for fall 2021, so add to spring 2021
+    for (let i = keys.length - 1; i > -1; i--)
+    {
+      let k = keys[i]
+      let len = terms[k].courseIds.length
+
+      if(len != 0 || i == 0) // add to latest term w/ classes, or first (and only) term
+      {
+        let tmp = this.state.rows
+        tmp[k].courseIds.push(selected)
+        this.setState({
+          rows: tmp
+        })
+      }
+    }
+  }
+
   render() {
+    console.log(this.state.rows)
     return (
       <div id="planner">
         <Navbar />
@@ -137,7 +175,7 @@ class Planner extends React.Component {
           <Grid.Row>
             <Grid.Column width={4}>
               <Grid.Row>
-                <Add classes={this.state.classes} />
+                <Add classes={this.state.classes} onSelect={this.handleSelect}/>
               </Grid.Row>
               <Grid.Row>
                 <Info />
