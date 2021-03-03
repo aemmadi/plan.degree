@@ -162,6 +162,7 @@ class Planner extends React.Component {
         this.setState({
           rows: tmp
         })
+        i = -1 // end loop
       }
     }
   }
