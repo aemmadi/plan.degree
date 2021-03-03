@@ -32,8 +32,11 @@ export default class Add extends React.Component {
     })
 
     let arr = []
+    let words = exp.split(/\s+/);
+    let regex = new RegExp("(?=.*" + words.join(")(?=.*") + ").+", "i");
+
     this.props.classes.forEach(element => {
-      if (element.course.includes(exp))
+      if (element.course.match(regex))
         arr.push({
           title: element.course,
           description: element.title
@@ -45,6 +48,8 @@ export default class Add extends React.Component {
       loading: false
     })
   }
+
+  
   
   render() {
     return (
