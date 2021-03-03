@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Button, Card, Container, Header, Icon, Input, Menu} from 'semantic-ui-react'
 import {Link, useHistory} from 'react-router-dom'
 import {useCookies} from 'react-cookie'
@@ -17,51 +17,63 @@ const App = () => {
     history.push("/login")
   }
 
-  (async () => {
-    const response = await fetch(`/session/${sessionId}`, {
-        method: "GET",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          "Access-Control-Allow-Origin": "*"
-        }
-      })
-
-    const content = await response.json()
-    console.log(content.data)
-  })()
+  useEffect(() => {
+    if(user === null) {
+      (async () => {
+        const response = await fetch(`/session/${sessionId}`, {
+            method: "GET",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              "Access-Control-Allow-Origin": "*"
+            }
+          })
+  
+        const content = await response.json()
+        setUser(content.data)
+      })()
+    }
+  }, [])
 
   const handleItemClick = (e, {name}) => {
     setActiveItem(name)
   }
 
+  const renderMain = () => {
+    if(user !== null)
+      return (
+        <Container>
+            <Header 
+              size='huge'
+              style={{
+                marginTop: '2em',
+                textAlign: 'center'
+              }}
+            >
+              Welcome {user.firstName}!
+            </Header>
+            <Header 
+              as="h2"
+              content="Degree Plans"
+              style={{
+                textAlign: 'center'
+              }}
+            />
+            <center style={{marginBottom: '1.5em'}}>
+              <Button color='blue'>New Degree Plan</Button>{' '}
+              <Button color='red'>Remove Plan</Button>
+            </center>
+            <Card.Group>
+              <Card fluid as={Link} to="/demo" color='orange' header="My First Degree Plan" meta="Automatically generated degree plan." />
+            </Card.Group>
+          </Container>
+    )
+  }
+
   return (
     <div id="app">
         <Navbar />
-        <Container>
-          <Header 
-            size='huge'
-            content="Welcome Bob!"
-            style={{
-              marginTop: '2em',
-              textAlign: 'center'
-            }}
-          />
-          <Header 
-            as="h2"
-            content="Degree Plans"
-            style={{
-              textAlign: 'center'
-            }}
-          />
-          <center style={{marginBottom: '1.5em'}}>
-            <Button color='blue'>New Degree Plan</Button>{' '}
-            <Button color='red'>Remove Plan</Button>
-          </center>
-          <Card.Group>
-            <Card fluid as={Link} to="/demo" color='orange' header="My First Degree Plan" meta="Automatically generated degree plan." />
-          </Card.Group>
-        </Container>
+        {renderMain()}
       </div>
   )
 }
