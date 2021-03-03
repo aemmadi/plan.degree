@@ -3,12 +3,18 @@ import {Link, useHistory} from 'react-router-dom'
 import {useCookies} from 'react-cookie'
 import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 import { GenerateHash } from './crypt'
+import { getSessionId } from '../../util'
 
 const Login = () => {
   const [cookie, setCookie] = useCookies(["session"])
   const [success, setSuccess] = useState(null)
   const [isEmailValid, setIsEmailValid] = useState(null)
   const history = useHistory()
+
+  const sessionId = getSessionId(cookie)
+  if(sessionId !== false) {
+    history.push("/app")
+  }
 
   const ValidateForm = (e) => {
     const formData = e.target.form
