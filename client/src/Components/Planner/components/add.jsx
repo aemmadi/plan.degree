@@ -33,7 +33,10 @@ export default class Add extends React.Component {
     let arr = []
     this.props.classes.forEach(element => {
       if (element.course.includes(exp))
-        arr.push(element.course)
+        arr.push({
+          title: element.course,
+          description: element.title
+        })
     });
 
     this.setState({
