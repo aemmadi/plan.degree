@@ -29,14 +29,15 @@ def get_user_from_session(session_id):
         session = open_sessions.find_one({'session.token': session_id})
         if session is not None:
             user_id = session["user"]["id"]
-            user = verified_users.find_one({'_id': ObjectId(user_id)}, [
-                                           'firstName', 'lastName', 'email', 'isOnboarding', 'data'])
+            user = verified_users.find_one({'_id': user_id}, [
+                                           'firstName', 'lastName', 'email', 'data'])
 
             if user is not None:
+                user = parse_json(user)
                 res = make_response(
                     jsonify(
-                        {'data': user}, 200
-                    )
+                        {'data': user}
+                    ), 200
                 )
                 res = set_headers(res)
                 return res
@@ -45,6 +46,7 @@ def get_user_from_session(session_id):
         else:
             error = True
     except:
+        # traceback.print_exc()
         error = True
 
     if(error):
@@ -158,7 +160,7 @@ def confirm_user(token, id):
         existing_user = verified_users.find_one({'_id': ObjectId(id)})
 
         if user and not existing_user:
-            user.update({"isOnboarding": True})
+            user.update({"data": {"isOnboarding": True}})
             verified_users.insert_one(user)
             pending_users.delete_one({'_id': ObjectId(id)})
         else:
