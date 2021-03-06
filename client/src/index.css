@@ -16,3 +16,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+#app {
+  height: 100vh;
+  background-image: url("https://res.cloudinary.com/kannabox/image/upload/v1612077604/plan.degree/bg-2.png");
+}

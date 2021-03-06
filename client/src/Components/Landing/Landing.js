@@ -105,10 +105,10 @@ class DesktopContainer extends Component {
                 <Menu.Item as='a'><strong>Careers</strong></Menu.Item>
                 <Menu.Item as='a'><strong>Contact Us</strong></Menu.Item>
                 <Menu.Item position='right'>
-                  <Button as='a'>
+                  <Button as={Link} to="/login">
                     Log in
                   </Button>
-                  <Button as='a' secondary style={{ marginLeft: '0.5em' }}>
+                  <Button as={Link} to="/signup" secondary style={{ marginLeft: '0.5em' }}>
                     Sign Up
                   </Button>
                 </Menu.Item>
