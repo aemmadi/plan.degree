@@ -4,6 +4,7 @@ import {Link, useHistory} from 'react-router-dom'
 import {useCookies} from 'react-cookie'
 
 import Navbar from './Components/Core/Navbar'
+import Onboarding from './Components/User/Onboarding'
 import { getSessionId } from './util'
 
 const App = () => {
@@ -40,7 +41,11 @@ const App = () => {
   }
 
   const renderMain = () => {
-    if(user !== null)
+    if(user !== null) {
+      if(user.data.isOnboarding) {
+        return <Onboarding user={user} />
+      }
+
       return (
         <Container>
             <Header 
@@ -67,7 +72,8 @@ const App = () => {
               <Card fluid as={Link} to="/demo" color='orange' header="My First Degree Plan" meta="Automatically generated degree plan." />
             </Card.Group>
           </Container>
-    )
+       )
+    }
   }
 
   return (
