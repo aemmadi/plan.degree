@@ -17,6 +17,7 @@ const Splash = props => (
       </Heading>
       <Subhead color="white">Plan your college degree in minutes!</Subhead>
       <CallToAction href="/getting-started" mt={3}>Get Started</CallToAction>
+      <CallToAction href="/demo" mt={3}>Live Demo</CallToAction>
       <CallToAction href="#feat" mt={3}>Learn More</CallToAction>
       <ScrollDownIndicator/>
     </Hero>

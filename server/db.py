@@ -5,7 +5,5 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-client = MongoClient(os.environ.get("DB_AUTH"))
-
-db = client.sample_mflix
-print(db.movies.find_one())
+client = MongoClient(os.environ.get("DB_AUTH"),
+                     ssl=True, ssl_cert_reqs='CERT_NONE')
