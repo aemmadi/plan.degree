@@ -14,16 +14,14 @@ const Navbar = () => {
             <Menu.Item
                 name='dashboard'
                 as={Link}
-                to="/dashboard"
+                to="/app"
                 active={activeItem === 'dashboard'}
                 onClick={handleItemClick}
             />
             <Menu.Item
                 name='planner'
                 as={Link}
-                to="/planner"
-                active={activeItem === 'planner'}
-                onClick={handleItemClick}
+                disabled
             />
             <Menu.Menu 
                 content="Plan.Degree" 
@@ -40,9 +38,7 @@ const Navbar = () => {
             <Menu.Menu position='right'>
                 <Menu.Item
                 name='settings'
-                as={Link}
-                to="/settings"
-                active={activeItem === 'settings'}
+                disabled
                 />
                 <Menu.Item
                 name='logout'

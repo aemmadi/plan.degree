@@ -53,20 +53,13 @@ export default class Add extends React.Component {
   
   render() {
     return (
-      <Container style={{height: '500px', width: '3000px'}}>
-        <center>
-          <h1>Add Course</h1>
           <Search 
-            fluid
             loading={this.state.loading}
             showNoResults={true}
             onSearchChange={this.handleSearch}
             onResultSelect={this.props.onSelect}
-            style={{marginTop: '1em'}}
             results={this.state.results}
           />
-        </center>
-      </Container>
     )
   }
 }
