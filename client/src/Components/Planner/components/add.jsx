@@ -18,13 +18,38 @@ export default class Add extends React.Component {
     super()
     this.state = {
       loading: false,
-      results: [{id: 0, content: "RHET 1302"}, {id: 1, content: "HIST 1301"}]
+      results: []
     }
   }
 
+  
+
   handleSearch = (e) => {
-    console.log(e.target.value)
+    let exp = e.target.value
+
+    this.setState({
+      loading: true
+    })
+
+    let arr = []
+    let words = exp.split(/\s+/);
+    let regex = new RegExp("(?=.*" + words.join(")(?=.*") + ").+", "i");
+
+    this.props.classes.forEach(element => {
+      if (element.course.match(regex))
+        arr.push({
+          title: element.course,
+          description: element.title
+        })
+    });
+
+    this.setState({
+      results: arr,
+      loading: false
+    })
   }
+
+  
   
   render() {
     return (
@@ -33,10 +58,12 @@ export default class Add extends React.Component {
           <h1>Add Course</h1>
           <Search 
             fluid
-            loading={this.state.loading} 
-            showNoResults={false}
+            loading={this.state.loading}
+            showNoResults={true}
             onSearchChange={this.handleSearch}
+            onResultSelect={this.props.onSelect}
             style={{marginTop: '1em'}}
+            results={this.state.results}
           />
         </center>
       </Container>

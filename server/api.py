@@ -341,7 +341,9 @@ def update_password(token, id):
 
 @app.route('/course/<tag>')
 def get_course(tag):
+    print(tag)
     tag = format_tag(tag)
+    print(tag)
     course_data = client["catalog_data"]["course_data"]
     result = list(course_data.find({"course": tag}))
     result = parse_json(result[0])
@@ -356,9 +358,11 @@ def get_course(tag):
     return res
 
 
-@app.route('/search/<tag>')
+@app.route('/course/search/<tag>')
 def search_courses(tag):
     tag = format_tag(tag)
+    if tag == 'ALL':
+        tag = ' '
     course_data = client["catalog_data"]["course_data"]
     result = list(course_data.find({"course": {"$regex": f".*{tag}.*"}}))
     result = parse_json(result)
