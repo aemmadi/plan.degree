@@ -50,7 +50,7 @@ class Planner extends React.Component {
   
   componentDidMount(){
      // api calls
-     fetch('http://127.0.0.1:5000/course/search/all').then(res => res.json()).then(data => {
+     fetch(`${process.env.REACT_APP_API_URL}/course/search/all`).then(res => res.json()).then(data => {
       this.setState({
         classes: data?.results
       })
