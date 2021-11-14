@@ -2,23 +2,48 @@ import React, { useEffect, useState } from 'react'
 import {Button, Card, Container, Header, Icon, Input, Menu} from 'semantic-ui-react'
 import {Link, useHistory} from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
-
+import {generateSignature} from './util'
 import Navbar from './Components/Core/Navbar'
+import NewUserPage from './Components/Core/NewUserPage'
+import PlanList from './Components/Core/PlanList'
 
 const App = () => {
   const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const [userData, setUserData] = useState(null)
+  const [isNewUser, setNewUser] = useState(false)
+
+  useEffect(() => {
+    const hash = generateSignature()
+    const getUserData = (hash) => {
+      fetch(`${process.env.REACT_APP_API_URL}/v1/get_user?email=${user.email}&name=${user.name}&signature=${hash.signature}&key=${hash.key}`)
+      .then(res => {
+        if(res.status === 404)
+          setNewUser(true)
+        return res.json()
+      })
+      .then(data => {
+        console.log(isNewUser, data)
+        setUserData(data)
+      })
+    }
+    if(user) {
+      getUserData(hash)
+    }
+  }, [isAuthenticated, user])
 
   if (isLoading) {
     return <div>Loading ...</div>;
   }
 
-  
-
   if (!isAuthenticated) {
     return loginWithRedirect()
   }
 
-  if(isAuthenticated && user) {
+  if(isAuthenticated && user) {   
+    const newUserPage = () => {
+      return <NewUserPage user={user} />
+    }
+
     const mainApp = () => {
       return (
          <Container>
@@ -38,13 +63,7 @@ const App = () => {
               textAlign: 'center'
             }}
           />
-          <center style={{marginBottom: '1.5em'}}>
-            <Button color='blue'>New Degree Plan</Button>{' '}
-            <Button color='red'>Remove Plan</Button>
-          </center>
-          <Card.Group>
-            <Card fluid as={Link} to="/demo" color='orange' header="My First Degree Plan" meta="Automatically generated degree plan." />
-          </Card.Group>
+          <PlanList user={user.email}/>
         </Container>
       )
     }
@@ -52,7 +71,7 @@ const App = () => {
     return (
       <div id="app">
         <Navbar />
-        {mainApp()}
+        {isNewUser ? newUserPage() : mainApp()}
       </div>
     )
   }

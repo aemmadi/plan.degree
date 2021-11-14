@@ -16,12 +16,12 @@ import {Container} from 'semantic-ui-react'
 // `;
 
 
-export default class Graduation extends React.Component {
-  render() {
-    return (
+const Graduation = (props) => {
+  return (
       <Container style={{height: '500px'}}>
         <center><h1>Degree Progress</h1></center>
       </Container>
     )
-  }
 }
+
+export default Graduation;

@@ -23,7 +23,7 @@ ReactDOM.render(
           <Route exact path = "/app">
             <App/>
           </Route>
-          <Route exact path = "/demo">
+          <Route exact path = "/plan/:id/:email">
             <Planner/>
           </Route>
       </Router>

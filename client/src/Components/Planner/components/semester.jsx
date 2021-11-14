@@ -28,7 +28,16 @@ display: flex;
 `;
 
 export default class Semester extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      credits: 0
+    }
+    this.credit = 0;
+  }
+
   render() {
+    let creditCount = 0;
     return (
       <Card fluid >
         <Card fluid header={this.props.row.title} style={{margin: '0em auto'}}/>
@@ -40,14 +49,20 @@ export default class Semester extends React.Component {
             isDraggingOver={snapshot.isDraggingOver}
              
           >
-              {this.props.courses.map((course, index) => (<Course key={course.id} course={course} index={index}/>
-            ))}
+              {this.props.courses.map((course, index) => {
+                let credit = course.content.split(' ')[1].charAt(1);
+                credit == "V" ? credit = "3" : credit = credit
+                creditCount += parseInt(credit);
+                this.credits = creditCount;
+                return (<Course key={course.id} course={course} index={index}/>
+            )})}
             {provided.placeholder}
+            {/* {this.setState({credits: creditCount})} */}
           </CourseList>
           )}
         </Droppable>
         <Card fluid>
-          <Card.Meta textAlign="right" style={{margin: '0.2em auto'}}>Credits: 0 Hours</Card.Meta>
+          <Card.Meta textAlign="right" style={{margin: '0.2em auto'}}>Credits: {this.credits} Hours</Card.Meta>
         </Card>
       </Card>
     )
