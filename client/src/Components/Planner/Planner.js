@@ -2,8 +2,8 @@ import React from 'react'
 import '@atlaskit/css-reset'
 import styled from 'styled-components'
 import {DragDropContext} from 'react-beautiful-dnd'
-import {Container, Button, Grid, Card} from 'semantic-ui-react'
-
+import {Container, Button, Grid, Card, Search, Segment} from 'semantic-ui-react'
+import {withRouter} from 'react-router-dom';
 import tempData from './tempData'
 import Semester from './components/semester'
 import Add from './components/add'
@@ -27,17 +27,54 @@ import Navbar from '../Core/Navbar'
 // `;
 
 class Planner extends React.Component {
-  constructor() {
-    super()
-    this.state = tempData
+  constructor(props) {
+    super(props)
+    this.semester = "Spring"
+    this.year = 2019
+    this.count = 1
+    
+    this.state = {
+      courses: {}, 
+      rows: {
+        'semester-1': {
+          id: 'semester-1',
+          title: 'Fall 2018',
+          courseIds: [],
+          
+        },
+      }, 
+      rowOrder: ['semester-1'],
+      user: this.props.user
+    }
   }
-
+  
   componentDidMount(){
      // api calls
      fetch('http://127.0.0.1:5000/course/search/all').then(res => res.json()).then(data => {
       this.setState({
         classes: data?.results
       })
+    })
+
+    fetch(`${process.env.REACT_APP_API_URL}/v1/get_user?email=${this.props.match.params.email}`).then(res => res.json()).then(data => {
+      this.setState({
+        user: data.user,
+        courses: {}, 
+        rows: {
+          'semester-1': {
+            id: 'semester-1',
+            title: `${data.user.start_semester} ${data.user.start_year}`,
+            courseIds: [],
+            
+          },
+        }, 
+        rowOrder: ['semester-1'],
+      })
+      this.semester = this.state.user.start_semester
+      this.year = this.state.user.start_year
+      this.semester == "Fall" ? this.year++ : this.year = this.year
+
+    this.semester == "Fall" ? this.semester = "Spring" : this.semester = "Fall"
     })
   }
 
@@ -109,11 +146,17 @@ class Planner extends React.Component {
 
   addNewSemester = () => {
     const semCount = this.state.rowOrder.length
+
     const newSem = {
-      id: `semester-${semCount+1}`,
-      title: `Semester ${semCount+1}`,
-      courseIds: []
+      id: `semester-${semCount + 1}`,
+      title: `${this.semester} ${this.year}`,
+      courseIds: [],
     }
+
+    this.semester == "Fall" ? this.year++ : this.year = this.year
+
+    this.semester == "Fall" ? this.semester = "Spring" : this.semester = "Fall"
+    
     const newRowOrder = this.state.rowOrder
     newRowOrder.push(newSem.id)
 
@@ -177,22 +220,25 @@ class Planner extends React.Component {
         <Navbar />
         <Grid style={{margin: '1em 1em 1em 1em'}}>
           <Grid.Row>
-            <Grid.Column width={4}>
-              <Grid.Row>
-                <Add classes={this.state.classes} onSelect={this.handleSelect}/>
-              </Grid.Row>
-              <Grid.Row>
-                <Info />
-              </Grid.Row>
-            </Grid.Column>
-            <Grid.Column width={8}>
+            {/* <Grid.Column width={8}>
+              <Graduation />
+            </Grid.Column> */}
+            <Grid.Column>
               <Container style={{marginTop: '1em'}}>
-                <div style={{marginBottom: '1em'}}>
+                <Segment.Group horizontal>
+                {/* <div style={{marginBottom: '1em'}}> */}
+                  <Segment basic>
                   <Button onClick={this.addNewSemester}>New Semester</Button>{' '}
-                  <Button disabled>Export Plan as PDF</Button>{' '}
-                  <Button disabled>Validate Plan</Button>{' '}
-                  <Button disabled>Save Plan</Button>{' '}
-                </div>
+                  {/* </Segment>
+                  <Segment> */}
+                  <Button>Validate Plan</Button>{'        '}
+                  </Segment>
+                  <Segment>
+                  <Add classes={this.state.classes} onSelect={this.handleSelect}/>
+                  </Segment>
+                  {console.log("HIT", this.props.length)}
+                {/* </div> */}
+                </Segment.Group>
                 <Card.Group>
                   <DragDropContext onDragEnd={this.onDragEnd}>
                       {this.state.rowOrder.map((rowId) => {
@@ -205,9 +251,6 @@ class Planner extends React.Component {
                 </Card.Group>
               </Container>
             </Grid.Column>
-            <Grid.Column width={4}>
-              <Graduation />
-            </Grid.Column>
           </Grid.Row>
         </Grid>
       </div>
@@ -215,4 +258,4 @@ class Planner extends React.Component {
   }
 }
 
-export default Planner;
+export default withRouter(Planner);
