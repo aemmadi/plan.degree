@@ -133,6 +133,9 @@ class Planner extends React.Component {
     let selected = data.result.title
     let terms = this.state.rows
 
+    if(selected in this.state.courses) // check if class already in plan
+      return
+
     let tmp = {
       id: selected,
       content: selected
