@@ -1,6 +1,5 @@
 import { createMedia } from '@artsy/fresnel'
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import {useState } from 'react'
 import {
   Button,
   Container,
@@ -16,6 +15,7 @@ import {
   Visibility,
 } from 'semantic-ui-react'
 import {Link} from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const { MediaContextProvider, Media } = createMedia({
   breakpoints: {
@@ -58,31 +58,86 @@ const HomepageHeading = ({ mobile }) => (
   </Container>
 )
 
-HomepageHeading.propTypes = {
-  mobile: PropTypes.bool,
+const DesktopContainer = ({children}) => {
+  const [fixed, setFixed] = useState(null)
+
+  const hideFixedMenu = () => setFixed(false)
+  const showFixedMenu = () => setFixed(true)
+
+  const { loginWithRedirect } = useAuth0();
+
+  return (
+    <Media greaterThan='mobile'>
+      <Visibility
+        once={false}
+        onBottomPassed={showFixedMenu}
+        onBottomPassedReverse={hideFixedMenu}
+      >
+        <Segment
+          textAlign='center'
+          style={{ 
+            minHeight: 700, 
+            padding: '1em 0em', 
+            backgroundImage: 'url("https://res.cloudinary.com/kannabox/image/upload/v1612077604/plan.degree/bg-2.png")',
+            backgroundSize: 'contain',
+          }}
+          vertical
+        >
+          <Menu
+            fixed={fixed ? 'top' : null}
+            secondary={!fixed}
+            size='large'
+          >
+            <Container>
+              <Menu.Item as='a' href="#home"><strong>Home</strong></Menu.Item>
+              <Menu.Item as='a' href="#features"><strong>Features</strong></Menu.Item>
+              <Menu.Item as='a' href="#about"><strong>About</strong></Menu.Item>
+              {/* <Menu.Item as='a'><strong>Careers</strong></Menu.Item>
+              <Menu.Item as='a'><strong>Contact Us</strong></Menu.Item> */}
+              <Menu.Item position='right'>
+                <Button onClick={() => loginWithRedirect()}>
+                  Log in
+                </Button>
+                <Button onClick={() => loginWithRedirect()} secondary style={{ marginLeft: '0.5em' }}>
+                  Sign Up
+                </Button>
+              </Menu.Item>
+            </Container>
+          </Menu>
+          <HomepageHeading />
+        </Segment>
+      </Visibility>
+      {children}
+    </Media>
+  )
 }
 
-/* Heads up!
- * Neither Semantic UI nor Semantic UI React offer a responsive navbar, however, it can be implemented easily.
- * It can be more complicated, but you can create really flexible markup.
- */
-class DesktopContainer extends Component {
-  state = {}
+const MobileContainer = ({children}) => {
+  const [sidebarOpened, setSidebarOpened] = useState(null)
 
-  hideFixedMenu = () => this.setState({ fixed: false })
-  showFixedMenu = () => this.setState({ fixed: true })
+  const handleSidebarHide = () => setSidebarOpened(false)
+  const handleToggle = () => setSidebarOpened(true)
 
-  render() {
-    const { children } = this.props
-    const { fixed } = this.state
+  const { loginWithRedirect } = useAuth0();
 
-    return (
-      <Media greaterThan='mobile'>
-        <Visibility
-          once={false}
-          onBottomPassed={this.showFixedMenu}
-          onBottomPassedReverse={this.hideFixedMenu}
+  return (
+    <Media as={Sidebar.Pushable} at='mobile'>
+      <Sidebar.Pushable>
+        <Sidebar
+          as={Menu}
+          animation='overlay'
+          secondary
+          onHide={handleSidebarHide}
+          vertical
+          visible={sidebarOpened}
         >
+        
+          <Menu.Item as='a' href="#home"><strong>Home</strong></Menu.Item>
+          <Menu.Item as='a' href="#features"><strong>Features</strong></Menu.Item>
+          <Menu.Item as='a' href="#about"><strong>About</strong></Menu.Item>
+        </Sidebar>
+
+        <Sidebar.Pusher dimmed={sidebarOpened}>
           <Segment
             textAlign='center'
             style={{ 
@@ -91,110 +146,30 @@ class DesktopContainer extends Component {
               backgroundImage: 'url("https://res.cloudinary.com/kannabox/image/upload/v1612077604/plan.degree/bg-2.png")',
               backgroundSize: 'contain',
             }}
-            vertical
-          >
-            <Menu
-              fixed={fixed ? 'top' : null}
-              secondary={!fixed}
-              size='large'
-            >
-              <Container>
-                <Menu.Item as='a' href="#home"><strong>Home</strong></Menu.Item>
-                <Menu.Item as='a' href="#features"><strong>Features</strong></Menu.Item>
-                <Menu.Item as='a' href="#about"><strong>About</strong></Menu.Item>
-                <Menu.Item as='a'><strong>Careers</strong></Menu.Item>
-                <Menu.Item as='a'><strong>Contact Us</strong></Menu.Item>
+            vertical >
+            <Container>
+              <Menu inverted pointing secondary size='large'>
+                <Menu.Item onClick={handleToggle}>
+                  <Icon name='sidebar' />
+                </Menu.Item>
                 <Menu.Item position='right'>
-                  <Button as={Link} to="/login">
+                  <Button onClick={() => loginWithRedirect()}>
                     Log in
                   </Button>
-                  <Button as={Link} to="/signup" secondary style={{ marginLeft: '0.5em' }}>
+                  <Button onClick={() => loginWithRedirect()} secondary style={{ marginLeft: '0.5em' }}>
                     Sign Up
                   </Button>
                 </Menu.Item>
-              </Container>
-            </Menu>
-            <HomepageHeading />
+              </Menu>
+            </Container>
+            <HomepageHeading mobile />
           </Segment>
-        </Visibility>
 
-        {children}
-      </Media>
-    )
-  }
-}
-
-DesktopContainer.propTypes = {
-  children: PropTypes.node,
-}
-
-class MobileContainer extends Component {
-  state = {}
-
-  handleSidebarHide = () => this.setState({ sidebarOpened: false })
-
-  handleToggle = () => this.setState({ sidebarOpened: true })
-
-  render() {
-    const { children } = this.props
-    const { sidebarOpened } = this.state
-
-    return (
-      <Media as={Sidebar.Pushable} at='mobile'>
-        <Sidebar.Pushable>
-          <Sidebar
-            as={Menu}
-            animation='overlay'
-            inverted
-            onHide={this.handleSidebarHide}
-            vertical
-            visible={sidebarOpened}
-          >
-            <Menu.Item as='a' active>
-              Home
-            </Menu.Item>
-            <Menu.Item as='a'>Work</Menu.Item>
-            <Menu.Item as='a'>Company</Menu.Item>
-            <Menu.Item as='a'>Careers</Menu.Item>
-            <Menu.Item as='a'>Log in</Menu.Item>
-            <Menu.Item as='a'>Sign Up</Menu.Item>
-          </Sidebar>
-
-          <Sidebar.Pusher dimmed={sidebarOpened}>
-            <Segment
-              inverted
-              textAlign='center'
-              style={{ minHeight: 350, padding: '1em 0em' }}
-              vertical
-            >
-              <Container>
-                <Menu inverted pointing secondary size='large'>
-                  <Menu.Item onClick={this.handleToggle}>
-                    <Icon name='sidebar' />
-                  </Menu.Item>
-                  <Menu.Item position='right'>
-                    <Button as='a' inverted>
-                      Log in
-                    </Button>
-                    <Button as='a' inverted style={{ marginLeft: '0.5em' }}>
-                      Sign Up
-                    </Button>
-                  </Menu.Item>
-                </Menu>
-              </Container>
-              <HomepageHeading mobile />
-            </Segment>
-
-            {children}
-          </Sidebar.Pusher>
-        </Sidebar.Pushable>
-      </Media>
-    )
-  }
-}
-
-MobileContainer.propTypes = {
-  children: PropTypes.node,
+          {children}
+        </Sidebar.Pusher>
+      </Sidebar.Pushable>
+    </Media>
+  )
 }
 
 const ResponsiveContainer = ({ children }) => (
@@ -207,10 +182,6 @@ const ResponsiveContainer = ({ children }) => (
     <MobileContainer>{children}</MobileContainer>
   </MediaContextProvider>
 )
-
-ResponsiveContainer.propTypes = {
-  children: PropTypes.node,
-}
 
 const Landing = () => (
   <ResponsiveContainer>
@@ -328,21 +299,24 @@ const Landing = () => (
                 <List.Item as='a' href='#home'>Home</List.Item>
                 <List.Item as='a' href='#features'>Features</List.Item>
                 <List.Item as='a' href='#about'>About</List.Item>
-                <List.Item as='a' href='#home'>Careers</List.Item>
-                <List.Item as='a' href='#home'>Contact Us</List.Item>
+                {/* <List.Item as='a' href='#home'>Careers</List.Item>
+                <List.Item as='a' href='#home'>Contact Us</List.Item> */}
               </List>
             </Grid.Column>
             <Grid.Column width={3}>
-              <Header inverted as='h4' content='Socials' />
+              {/* <Header inverted as='h4' content='Socials' />
               <List link inverted>
                 <List.Item as='a'>E-Mail</List.Item>
                 <List.Item as='a'>LinkedIn</List.Item>
               </List>
             </Grid.Column>
-            <Grid.Column width={7}>
-              <Header as='h4' inverted>
-                Legal
-              </Header>
+            <Grid.Column width={7}> */}
+              <Header as='h4' inverted content='Legal' />
+              <List link inverted>
+                <List.Item as='a' href='#'>Terms of Use</List.Item>
+                <List.Item as='a' href='#'>Privacy Policy</List.Item>
+              </List>
+              
               <p>
                 © Plan.Degree 2021, All rights reserved.
               </p>
